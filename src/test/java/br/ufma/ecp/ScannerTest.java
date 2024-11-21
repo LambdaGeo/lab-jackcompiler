@@ -45,6 +45,42 @@ public class ScannerTest extends TestSupport {
 
 
     @Test
+    public void testScannerVoidKeyword() {
+        var input = "void";
+        var expectedResult = """
+            <keyword> void </keyword> 
+            """;
+
+        var scanner = new Scanner(input.getBytes(StandardCharsets.UTF_8));
+        var result = new StringBuilder();
+        
+        for (Token tk = scanner.nextToken(); tk.type !=TokenType.EOF; tk = scanner.nextToken()) {
+            result.append(String.format("%s\n",tk.toString()));
+        }
+
+        assertEquals(expectedResult, result.toString());
+
+    }
+
+    @Test
+    public void testScannerWhileKeyword() {
+        var input = "while";
+        var expectedResult = """
+            <keyword> while </keyword> 
+            """;
+
+        var scanner = new Scanner(input.getBytes(StandardCharsets.UTF_8));
+        var result = new StringBuilder();
+        
+        for (Token tk = scanner.nextToken(); tk.type !=TokenType.EOF; tk = scanner.nextToken()) {
+            result.append(String.format("%s\n",tk.toString()));
+        }
+
+        assertEquals(expectedResult, result.toString());
+
+    }
+
+    @Test
     public void testScannerWithSquare() throws IOException {
         var input = fromFile("Square/Square.jack");
         var expectedResult =  fromFile("Square/SquareT.xml");

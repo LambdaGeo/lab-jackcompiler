@@ -27,7 +27,7 @@ public class Token {
             type = "keyword";
     
 
-        return "<"+ type +">" + lexeme + "</"+ type + ">";
+        return "<"+ type +"> " + lexeme + " </"+ type + ">";
     }
     
 }
