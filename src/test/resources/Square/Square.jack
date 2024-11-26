@@ -5,7 +5,13 @@
 
 // (same as projects/09/Square/Square.jack)
 
-/** Implements a graphical square. */
+/* Implements a graphical square. 
+
+sads
+dfdsdsf
+
+fdsfdsf
+**dsadsasda*/
 class Square {
 
    field int x, y; // screen location of the square's top-left corner

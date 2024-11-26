@@ -79,6 +79,50 @@ public class ScannerTest extends TestSupport {
     }
 
     @Test
+    public void testScannerBlockComment() {
+        var input = """
+            /*
+             é um comentario
+             */
+            /
+            """;
+        var expectedResult = """
+            <symbol> / </symbol> 
+            """;
+
+        var scanner = new Scanner(input.getBytes(StandardCharsets.UTF_8));
+        var result = new StringBuilder();
+        
+        for (Token tk = scanner.nextToken(); tk.type !=TokenType.EOF; tk = scanner.nextToken()) {
+            result.append(String.format("%s\n",tk.toString()));
+        }
+
+        assertEquals(expectedResult, result.toString());
+
+    }
+
+    @Test
+    public void testScannerLineComment() {
+        var input = """
+            // é um comentario
+            /
+            """;
+        var expectedResult = """
+            <symbol> / </symbol> 
+            """;
+
+        var scanner = new Scanner(input.getBytes(StandardCharsets.UTF_8));
+        var result = new StringBuilder();
+        
+        for (Token tk = scanner.nextToken(); tk.type !=TokenType.EOF; tk = scanner.nextToken()) {
+            result.append(String.format("%s\n",tk.toString()));
+        }
+
+        assertEquals(expectedResult, result.toString());
+
+    }
+
+    @Test
     public void testScannerWhileKeyword() {
         var input = "while";
         var expectedResult = """
