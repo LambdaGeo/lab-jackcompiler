@@ -7,6 +7,8 @@ import br.ufma.ecp.token.TokenType;
 
 import static br.ufma.ecp.token.TokenType.*;
 
+import javax.swing.text.Segment;
+
 
 public class Parser {
 
@@ -78,6 +80,15 @@ public class Parser {
             break;
           case IDENT:
             expectPeek(TokenType.IDENT);
+                if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
+                    parseSubroutineCall();
+                } else { // variavel comum ou array
+                    if (peekTokenIs(LBRACKET)) { // array
+                        expectPeek(LBRACKET);
+                        parseExpression();      
+                        expectPeek(RBRACKET);        
+                    } 
+                }
             break;
           default:
             throw error(peekToken, "term expected");
@@ -146,32 +157,113 @@ public class Parser {
          }
          return new ParseError();
      }
-
+    //subroutineName '(' expressionList? ')' | (className|varName) '.' subroutineName '(' expressionList? ')'
     public void parseSubroutineCall() {
         
-            expectPeek(IDENT);
+
+        if (peekTokenIs(LPAREN)) { // método da propria classe
             expectPeek(LPAREN);
+            parseExpressionList();
             expectPeek(RPAREN);
+        } else {
+            // pode ser um metodo de um outro objeto ou uma função
+            expectPeek(DOT);
+            expectPeek(IDENT); // nome da função
+
+            expectPeek(LPAREN);
+            parseExpressionList();
+            expectPeek(RPAREN);
+        }
+
+        
          
     }
 
+    void parseExpressionList() {
+        printNonTerminal("expressionList");
+
+        if (!peekTokenIs(RPAREN)) // verifica se tem pelo menos uma expressao
+        {
+            parseExpression();
+        }
+
+        // procurando as demais
+        while (peekTokenIs(COMMA)) {
+            expectPeek(COMMA);
+            parseExpression();
+        }
+
+        printNonTerminal("/expressionList");
+    }
+
     public void parseStatements() {
-        while (peekTokenIs(LET) || peekTokenIs(DO) ) {
+        printNonTerminal("statements");
+        while (peekTokenIs(LET) 
+        || peekTokenIs(DO) 
+        
+        ) {
             parseStatement();
         }
+        printNonTerminal("/statements");
     }
 
-    public void parseStatement() {
 
-        if (peekTokenIs(LET)) {
-            parseLet();
-        } else if (peekTokenIs(DO)) {
-            parseDo();
-        }else {
-            report(peekToken.line, " at ", "expected statement");
+    void parseStatement() {
+            switch (peekToken.type) {
+                case LET:
+                    parseLet();
+                    break;
+                case WHILE:
+                    parseWhile();
+                    break;
+                case IF:
+                    parseIf();
+                    break;
+                case RETURN:
+                    //parseReturn();
+                    break;
+                case DO:
+                    parseDo();
+                    break;
+                default:
+                    throw error(peekToken, "Expected a statement");
+            }
+    }
+
+
+    // 'while' '(' expression ')' '{' statements '}'
+    void parseWhile() {
+        printNonTerminal("whileStatement");
+
+        expectPeek(WHILE);
+        expectPeek(LPAREN);
+        parseExpression();
+        expectPeek(RPAREN);
+        expectPeek(LBRACE);
+        parseStatements();
+        expectPeek(RBRACE);
+        printNonTerminal("/whileStatement");
+    }
+
+    //'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
+    public void parseIf() {
+        printNonTerminal("ifStatement");
+        expectPeek(IF);
+        expectPeek(LPAREN);
+        parseExpression();
+        expectPeek(RPAREN);
+        expectPeek(LBRACE);
+        parseStatements();
+        expectPeek(RBRACE);
+        if (peekTokenIs(ELSE)){
+            expectPeek(ELSE);
+            expectPeek(LBRACE);
+            parseStatements();
+            expectPeek(RBRACE);    
         }
-
+        printNonTerminal("/ifStatement");
     }
+
 
     public void parseDo() {
         printNonTerminal("doStatement");

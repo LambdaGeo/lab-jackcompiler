@@ -186,5 +186,103 @@ public class ParserTest extends TestSupport {
         assertEquals(expectedResult, result);
     }
 
+    @Test
+    public void testParseIf() {
+        var input = "if (direction = 1) { do moveUp(); }";
+        var expectedResult = """
+            <ifStatement>
+            <keyword> if </keyword>
+            <symbol> ( </symbol>
+            <expression>
+              <term>
+                <identifier> direction </identifier>
+              </term>
+              <symbol> = </symbol>
+              <term>
+                <integerConstant> 1 </integerConstant>
+              </term>
+            </expression>
+            <symbol> ) </symbol>
+            <symbol> { </symbol>
+            <statements>
+              <doStatement>
+                <keyword> do </keyword>
+                <identifier> moveUp </identifier>
+                <symbol> ( </symbol>
+                <expressionList>
+                </expressionList>
+                <symbol> ) </symbol>
+                <symbol> ; </symbol>
+              </doStatement>
+            </statements>
+            <symbol> } </symbol>
+          </ifStatement>
+                """;
+
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseIf();
+        var result = parser.XMLOutput();
+        expectedResult = expectedResult.replaceAll("  ", "");
+        result = result.replaceAll("\r", ""); // no codigo em linux não tem o retorno de carro
+        assertEquals(expectedResult, result);
+    }
+
+
+    @Test
+    public void testParseWhile() {
+        var input = """
+          while ( key = 0 ) {
+            let key = 10;
+            do moveSquare();
+          }
+            """;
+        var expectedResult = """
+          <whileStatement>
+          <keyword> while </keyword>
+          <symbol> ( </symbol>
+          <expression>
+            <term>
+              <identifier> key </identifier>
+            </term>
+            <symbol> = </symbol>
+            <term>
+              <integerConstant> 0 </integerConstant>
+            </term>
+          </expression>
+          <symbol> ) </symbol>
+          <symbol> { </symbol>
+          <statements>
+            <letStatement>
+              <keyword> let </keyword>
+              <identifier> key </identifier>
+              <symbol> = </symbol>
+              <expression>
+                <term>
+                  <integerConstant> 10 </integerConstant>
+                </term>
+              </expression>
+              <symbol> ; </symbol>
+            </letStatement>
+            <doStatement>
+              <keyword> do </keyword>
+              <identifier> moveSquare </identifier>
+              <symbol> ( </symbol>
+              <expressionList>
+              </expressionList>
+              <symbol> ) </symbol>
+              <symbol> ; </symbol>
+            </doStatement>
+          </statements>
+          <symbol> } </symbol>
+        </whileStatement>
+                """;
+
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseWhile();
+        var result = parser.XMLOutput();
+        expectedResult = expectedResult.replaceAll("  ", "");
+        result = result.replaceAll("\r", ""); // no codigo em linux não tem o retorno de carro
+        assertEquals(expectedResult, result);
+    }
 
 }
