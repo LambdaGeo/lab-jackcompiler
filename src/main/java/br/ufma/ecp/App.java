@@ -14,21 +14,16 @@ public class App
     {
 
     
-        String input = "45  + if - \"ola\" laranja 876";
-        Scanner scan = new Scanner (input.getBytes());
-        for (Token tk = scan.nextToken(); tk.type != EOF; tk = scan.nextToken()) {
-            System.out.println(tk);
-        }
-
-        /*
+        String input = """
+                let a = 10;
+                do print();
+                """;
+    
         Parser p = new Parser (input.getBytes());
-        p.parse();
-        */
+        p.parseStatements();
 
-
-        //Parser p = new Parser (fromFile().getBytes());
-        //p.parse();
-
+        System.out.println(p.XMLOutput());
+        
         /*
         String input = "489-85+69";
         Scanner scan = new Scanner (input.getBytes());

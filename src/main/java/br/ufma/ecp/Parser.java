@@ -1,7 +1,11 @@
 package br.ufma.ecp;
 
 import br.ufma.ecp.token.Token;
+
+
 import br.ufma.ecp.token.TokenType;
+
+import static br.ufma.ecp.token.TokenType.*;
 
 
 public class Parser {
@@ -26,6 +30,33 @@ public class Parser {
  
      public void parse () {
          
+     }
+
+     void parseExpression() {
+        printNonTerminal("expression");
+        parseTerm ();
+        while (isOperator(peekToken.lexeme)) {
+            expectPeek(peekToken.type);
+            parseTerm();
+        }
+        printNonTerminal("/expression");
+     }
+
+     void parseLet() {
+        printNonTerminal("letStatement");
+        expectPeek(LET);
+        expectPeek(IDENT);
+
+        if (peekTokenIs(LBRACKET)) {
+            expectPeek(LBRACKET);
+            parseExpression();
+            expectPeek(RBRACKET);
+        }
+
+        expectPeek(EQ);
+        parseExpression();
+        expectPeek(SEMICOLON);
+        printNonTerminal("/letStatement");
      }
 
      void parseTerm() {
@@ -56,6 +87,11 @@ public class Parser {
       }
  
      // funções auxiliares
+
+     static public boolean isOperator(String op) {
+        return op!= "" && "+-*/<>=~&|".contains(op);
+    }
+
      public String XMLOutput() {
          return xmlOutput.toString();
      }
@@ -110,6 +146,40 @@ public class Parser {
          }
          return new ParseError();
      }
+
+    public void parseSubroutineCall() {
+        
+            expectPeek(IDENT);
+            expectPeek(LPAREN);
+            expectPeek(RPAREN);
+         
+    }
+
+    public void parseStatements() {
+        while (peekTokenIs(LET) || peekTokenIs(DO) ) {
+            parseStatement();
+        }
+    }
+
+    public void parseStatement() {
+
+        if (peekTokenIs(LET)) {
+            parseLet();
+        } else if (peekTokenIs(DO)) {
+            parseDo();
+        }else {
+            report(peekToken.line, " at ", "expected statement");
+        }
+
+    }
+
+    public void parseDo() {
+        printNonTerminal("doStatement");
+        expectPeek(DO);
+        parseSubroutineCall();
+        expectPeek(SEMICOLON);
+        printNonTerminal("/doStatement");
+    }
  
  
  }

@@ -68,5 +68,123 @@ public class ParserTest extends TestSupport {
   
     }
 
+    @Test
+    public void testParseExpressionSimple() {
+        var input = "10+20";
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseExpression();
+        
+        var expectedResult =  """
+          <expression>
+          <term>
+          <integerConstant> 10 </integerConstant>
+          </term>
+          <symbol> + </symbol>
+          <term>
+          <integerConstant> 20 </integerConstant>
+          </term>
+          </expression>
+          """;
+              
+          var result = parser.XMLOutput();
+          result = result.replaceAll("\r", ""); 
+          expectedResult = expectedResult.replaceAll("  ", "");
+          assertEquals(result, expectedResult);    
+
+    }
+
+    @Test
+    public void testParseExpressionSimple2() {
+        var input = "a+b";
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseExpression();
+        
+        var expectedResult =  """
+          <expression>
+          <term>
+          <identifier> a </identifier>
+          </term>
+          <symbol> + </symbol>
+          <term>
+          <identifier> b </identifier>
+          </term>
+          </expression>
+          """;
+              
+          var result = parser.XMLOutput();
+          result = result.replaceAll("\r", ""); 
+          expectedResult = expectedResult.replaceAll("  ", "");
+          assertEquals(result, expectedResult);    
+
+    }
+
+    @Test
+    public void testParseSubroutineCall() {
+        var input = "hello()";
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseSubroutineCall();
+        
+        var expectedResult =  """
+          <identifier> hello </identifier>
+          <symbol> ( </symbol>
+          <symbol> ) </symbol>
+          """;
+              
+          var result = parser.XMLOutput();
+          result = result.replaceAll("\r", ""); 
+          expectedResult = expectedResult.replaceAll("  ", "");
+          assertEquals(expectedResult, result);    
+
+    }
+
+    @Test
+    public void testParseDo() {
+        var input = "do hello();";
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseDo();
+
+        var expectedResult = """
+            <doStatement>
+            <keyword> do </keyword>
+            <identifier> hello </identifier>
+            <symbol> ( </symbol>
+            <symbol> ) </symbol>
+            <symbol> ; </symbol>
+          </doStatement>
+                """;
+        var result = parser.XMLOutput();
+        expectedResult = expectedResult.replaceAll("  ", "");
+        result = result.replaceAll("\r", ""); // no codigo em linux não tem o retorno de carro
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void testParseLetSimple() {
+        var input = "let var1 = 10+20;";
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseLet();
+				var expectedResult =  """
+	     <letStatement>
+        <keyword> let </keyword>
+        <identifier> var1 </identifier>
+        <symbol> = </symbol>
+        <expression>
+          <term>
+          <integerConstant> 10 </integerConstant>
+          </term>
+          <symbol> + </symbol>
+          <term>
+          <integerConstant> 20 </integerConstant>
+          </term>
+          </expression>
+        <symbol> ; </symbol>
+      </letStatement> 
+				""";
+        var result = parser.XMLOutput();
+        expectedResult = expectedResult.replaceAll("  ", "");
+        result = result.replaceAll("\r", ""); // no codigo em linux não tem o retorno de carro
+        assertEquals(expectedResult, result);
+    }
+
 
 }
