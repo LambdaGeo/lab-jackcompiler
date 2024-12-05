@@ -165,15 +165,7 @@ public class Parser {
             expectPeek(LPAREN);
             parseExpressionList();
             expectPeek(RPAREN);
-        } else {
-            // pode ser um metodo de um outro objeto ou uma função
-            expectPeek(DOT);
-            expectPeek(IDENT); // nome da função
-
-            expectPeek(LPAREN);
-            parseExpressionList();
-            expectPeek(RPAREN);
-        }
+        } 
 
         
          
